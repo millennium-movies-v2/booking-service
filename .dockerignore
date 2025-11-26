@@ -1,0 +1,42 @@
+# IDE / OS files
+**/.classpath
+**/.project
+**/.settings
+**/.vscode
+**/.idea
+**/.toolstarget
+**/.vs
+
+# Git
+**/.git
+**/.gitignore
+
+# Env & local config
+**/.env
+**/secrets.dev.yaml
+**/values.dev.yaml
+**/docker-compose*
+**/compose.y*ml
+
+# Build / dev artifacts
+**/node_modules
+**/npm-debug.log
+**/vendor
+**/tests
+**/phpunit.xml
+**/Dockerfile*
+**/.next
+**/.cache
+**/storage/debugbar
+**/charts
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+
+# Documentation
+LICENSE
+README.md
+
+# Exceptions
+!**/composer.json
+!**/composer.lock
