@@ -5,6 +5,7 @@ namespace App\Models;
 use Database\Factories\StatusFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
 * @property string $id
@@ -24,4 +25,9 @@ class Status extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class);
+    }
 }
