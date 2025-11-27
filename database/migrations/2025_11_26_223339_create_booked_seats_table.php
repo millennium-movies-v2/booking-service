@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('booked_seats', function (Blueprint $table) {
-            $table->uuid()->primary();
+            $table->uuid('id')->primary();
             $table->foreignIdFor(Booking::class)->constrained()->cascadeOnDelete();
             $table->uuid('seat_id');
             $table->timestamps();
