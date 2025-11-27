@@ -70,4 +70,17 @@ class BookingCreationTest extends TestCase
         ]);
     }
 
+    public function test_that_booking_creates_booked_seat_entries(): void
+    {
+        $bookingData = $this->bookingData();
+        
+        $totalSeats = collect($bookingData['seats'])
+        ->map(fn($seatGroup) => count($seatGroup['seat_ids']))
+        ->sum();
+
+        $this->post('/bookings', $bookingData);
+
+        $this->assertDatabaseCount('booked_seats', $totalSeats);
+    }
+
 }
