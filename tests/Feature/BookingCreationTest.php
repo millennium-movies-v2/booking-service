@@ -9,17 +9,9 @@ use Tests\TestCase;
 class BookingCreationTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
-
-    public function test_that_post_bookings_returns_201_status_code(): void
+    private function bookingData(): array
     {
-        $response = $this->post('/bookings');
-
-        $response->assertStatus(201);
-    }
-
-    public function test_that_post_bookings_returns_correct_json_structure()
-    {
-        $bookingData = [
+        return [
             'user_id'      => $this->faker->uuid(),
             'screening_id' => $this->faker->uuid(),
             'seats' => [
@@ -29,21 +21,35 @@ class BookingCreationTest extends TestCase
                         $this->faker->uuid(),
                     ],
                     'pricing' => [
-                        'type'       => 'VIP',
-                        'unit_price' => $this->faker->randomFloat(2, 20, 30),
+                        'type'       => 'Regular',
+                        'unit_price' => $this->faker->randomFloat(2, 10, 20),
                     ],
                 ],
                 [
                     'seat_ids' => [
                         $this->faker->uuid(),
+                        $this->faker->uuid(),
+                        $this->faker->uuid(),
                     ],
                     'pricing' => [
-                        'type'       => 'Regular',
+                        'type'       => 'VIP',
                         'unit_price' => $this->faker->randomFloat(2, 10, 20),
                     ],
                 ],
             ],
         ];
+    }
+
+    public function test_that_post_bookings_returns_201_status_code(): void
+    {
+        $response = $this->post('/bookings', $this->bookingData());
+
+        $response->assertStatus(201);
+    }
+
+    public function test_that_post_bookings_returns_correct_json_structure(): void
+    {
+        $bookingData = $this->bookingData();
 
         $response = $this->post('/bookings', $bookingData);
 
