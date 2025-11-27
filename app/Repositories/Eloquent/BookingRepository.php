@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Repositories\Eloquent;
+
+use App\DTOs\BookingDataDTO;
+use App\Models\Booking;
+use App\Models\Status;
+use App\Repositories\Contracts\IBookingRepository;
+
+class BookingRepository implements IBookingRepository
+{
+    public function create(BookingDataDTO $data): Booking
+    {
+        $status = Status::query()
+        ->firstOrCreate([
+            'name' => $data->status->value,
+        ]);
+
+        return Booking::query()
+        ->create([
+            'user_id'   => $data->userId,
+            'price'     => $data->price,
+            'status_id' => $status->id,
+        ]);
+    }
+}

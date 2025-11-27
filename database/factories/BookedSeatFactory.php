@@ -2,10 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\BookedSeat;
+use App\Models\Booking;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BookedSeat>
+ * @extends Factory<BookedSeat>
  */
 class BookedSeatFactory extends Factory
 {
@@ -17,7 +19,9 @@ class BookedSeatFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'id' => $this->faker->uuid(),
+            'booking_id' => Booking::factory(),
+            'seat_id' => $this->faker->uuid(),
         ];
     }
 }
