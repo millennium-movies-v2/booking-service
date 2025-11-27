@@ -15,7 +15,7 @@ class Status extends Model
 {
     /** @use HasFactory<StatusFactory> */
     use HasFactory;
-    
+
     protected $keyType = 'string';
 
     public $incrementing = false;
