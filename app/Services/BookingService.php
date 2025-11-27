@@ -9,13 +9,15 @@ use App\Enums\StatusEnum;
 use App\Factories\Pricing\SeatPricingStrategyFactory;
 use App\Models\BookedSeat;
 use App\Models\Booking;
+use App\Repositories\Contracts\IBookedSeatRepository;
 use App\Repositories\Contracts\IBookingRepository;
 
 class BookingService
 {
     public function __construct(
         protected IBookingRepository $bookingRepository,
-        )
+        protected IBookedSeatRepository $bookedSeatRepository,
+    )
     {}
 
     public function createBooking(array $data): Booking
@@ -39,14 +41,11 @@ class BookingService
 
         $booking = $this->bookingRepository->create($bookingDTO);
 
-        foreach ($seatDTOs as $seat) {
-            foreach ($seat->seatIds as $seatId) {
-                BookedSeat::query()->create([
-                    'booking_id' => $booking->id,
-                    'seat_id'    => $seatId,
-                ]);
-            }
-        }
+        $seatIds = collect($seatDTOs)
+        ->flatMap(fn($seat) => $seat->seatIds)
+        ->all();
+
+        $this->bookedSeatRepository->createMany($booking->id, $seatIds);
 
         return $booking;
     }
