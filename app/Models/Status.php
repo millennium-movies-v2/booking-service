@@ -6,6 +6,7 @@ use Database\Factories\StatusFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 /**
 * @property string $id
@@ -29,5 +30,12 @@ class Status extends Model
     public function bookings(): HasMany
     {
         return $this->hasMany(Booking::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            $model->id = Str::uuid();
+        });
     }
 }

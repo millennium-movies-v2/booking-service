@@ -6,6 +6,8 @@ use Database\Factories\BookingFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 /**
  * @property string $id
@@ -35,5 +37,17 @@ class Booking extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(Status::class);
+    }
+
+    public function bookedSeat(): HasMany
+    {
+        return $this->hasMany(BookedSeat::class);
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            $model->id = Str::uuid();
+        });
     }
 }

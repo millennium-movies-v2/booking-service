@@ -58,4 +58,16 @@ class BookingCreationTest extends TestCase
             'status',
         ]);
     }
+
+    public function test_that_booking_is_created_in_database(): void
+    {
+        $bookingData = $this->bookingData();
+
+        $this->post('/bookings', $bookingData);
+
+        $this->assertDatabaseHas('bookings', [
+            'user_id' => $bookingData['user_id'],
+        ]);
+    }
+
 }
