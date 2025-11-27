@@ -23,7 +23,18 @@ class StoreBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'user_id' => ['required', 'string', 'uuid'],
+            'screening_id' => ['required', 'string', 'uuid'],
+
+            'seats' => ['required', 'array', 'min:1'],
+
+            'seats.*.seat_ids'   => ['required', 'array', 'min:1'],
+            'seats.*.seat_ids.*' => ['required', 'string', 'uuid'],
+
+            'seats.*.pricing'             => ['required', 'array'],
+            'seats.*.pricing.type'        => ['required', 'string'],
+            'seats.*.pricing.unit_price'  => ['required', 'numeric', 'min:0'],
         ];
     }
+
 }
