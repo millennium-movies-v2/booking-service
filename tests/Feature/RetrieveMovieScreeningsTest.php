@@ -21,7 +21,7 @@ class RetrieveMovieScreeningsTest extends TestCase
                 'movie_id' => $movie_id,
             ]);
 
-        $response = $this->get('/movies/'. $movie_id . '/screenings');
+        $response = $this->get(route('movies.screenings.index', $movie_id));
 
         $response->assertOk();
 
