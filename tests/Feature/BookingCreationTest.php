@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Events\SeatReservationRequested;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class BookingCreationTest extends TestCase
@@ -81,6 +83,19 @@ class BookingCreationTest extends TestCase
         $this->post('/bookings', $bookingData);
 
         $this->assertDatabaseCount('booked_seats', $totalSeats);
+    }
+
+    public function test_that_booking_dispatches_seat_reservation_event(): void
+    {
+        Event::fake([
+            SeatReservationRequested::class,
+        ]);
+
+        $bookingData = $this->bookingData();
+
+        $this->post('/bookings', $bookingData);
+
+        Event::assertDispatched(SeatReservationRequested::class);
     }
 
 }
