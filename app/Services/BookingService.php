@@ -6,6 +6,7 @@ use App\DTOs\BookingDataDTO;
 use App\DTOs\SeatDTO;
 use App\Enums\SeatTypeEnum;
 use App\Enums\StatusEnum;
+use App\Events\SeatReservationRequested;
 use App\Factories\Pricing\SeatPricingStrategyFactory;
 use App\Models\BookedSeat;
 use App\Models\Booking;
@@ -46,6 +47,8 @@ class BookingService
         ->all();
 
         $this->bookedSeatRepository->createMany($booking->id, $seatIds);
+
+        SeatReservationRequested::dispatch();
 
         return $booking;
     }
