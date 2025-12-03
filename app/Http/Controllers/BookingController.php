@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Services\BookingService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -34,5 +35,23 @@ class BookingController extends Controller
         ];
 
         return response()->json($response, 201);
+    }
+
+    public function destroy(string $id): JsonResponse
+    {
+        $userId = (string) request()->header('X-User-Id');
+
+        try {
+            $isDeleted = $this->bookingService->deleteBooking($id, $userId);
+
+            return response()->json([
+                'message' => $isDeleted ? 'Booking deleted successfully' : 'Failed to delete booking',
+            ]);
+
+        } catch (AuthorizationException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 403);
+        }
     }
 }

@@ -11,4 +11,8 @@ interface IBookingRepository
     public function create(BookingDataDTO $data): Booking;
     
     public function getByUserId(string $userId): Collection;
+
+    public function findById(string $id): Booking;
+
+    public function delete(Booking $booking): bool;
 }

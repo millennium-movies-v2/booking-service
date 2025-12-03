@@ -6,7 +6,7 @@ use App\Http\Controllers\ScreeningReservedSeatController;
 use Illuminate\Support\Facades\Route;
 
 Route::apiResource('bookings', BookingController::class)
-->only(['index', 'store']);
+->only(['index', 'store', 'destroy']);
 
 Route::apiResource('movies.screenings', MovieScreeningController::class)
     ->only(['index']);
