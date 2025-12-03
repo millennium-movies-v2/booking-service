@@ -32,4 +32,14 @@ class BookingRepository implements IBookingRepository
             ->where('user_id', $userId)
             ->get();
     }
+
+    public function findById(string $id): Booking
+    {
+        return Booking::query()->findOrFail($id);
+    }
+
+    public function delete(Booking $booking): bool
+    {
+        return $booking->delete();
+    }
 }

@@ -12,6 +12,7 @@ use App\Models\BookedSeat;
 use App\Models\Booking;
 use App\Repositories\Contracts\IBookedSeatRepository;
 use App\Repositories\Contracts\IBookingRepository;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 
 class BookingService
@@ -57,5 +58,19 @@ class BookingService
     public function getBookingsForUser(string $userId): Collection
     {
         return $this->bookingRepository->getByUserId($userId);
+    }
+
+    /**
+     * @throws AuthorizationException
+     */
+    public function deleteBooking(string $bookingId, string $userId): bool
+    {
+        $booking = $this->bookingRepository->findById($bookingId);
+
+        if ($booking->user_id != $userId) {
+            throw new AuthorizationException('Not authorized to delete this booking');
+        }
+
+        return $this->bookingRepository->delete($booking);
     }
 }
