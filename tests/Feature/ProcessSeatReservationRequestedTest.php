@@ -55,6 +55,26 @@ class ProcessSeatReservationRequestedTest extends TestCase
         Event::assertNotDispatched(SeatReservationFailed::class);
     }
 
+
+    public function test_it_fails_seat_reservation_when_a_seat_is_not_available()
+    {
+        $this->reservedSeatRepository->shouldReceive('areSeatsAvailable')
+             ->once()
+             ->with('screening-123', ['A1', 'A2'])
+             ->andReturn(false);
+
+        $event = new SeatReservationRequested(
+            'booking-123',
+            'screening-123',
+            ['A1', 'A2']
+        );
+
+        $this->listener->handle($event);
+
+        Event::assertDispatched(SeatReservationFailed::class);
+        Event::assertNotDispatched(SeatReservationConfirmed::class);
+    }
+
     protected function tearDown(): void
     {
         \Mockery::close();
