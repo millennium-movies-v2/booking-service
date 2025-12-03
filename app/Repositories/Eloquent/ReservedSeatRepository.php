@@ -14,4 +14,18 @@ class ReservedSeatRepository implements IReservedSeatRepository
             ->where(['screening_id' => $screeningId])
             ->get();
     }
+
+    public function areSeatsAvailable(string $screeningId, array $seatIds): bool
+    {
+        if (empty($seatIds)) {
+            return false;
+        }
+
+        $anyReserved = ReservedSeat::query()
+            ->whereIn('seat_id', $seatIds)
+            ->where('screening_id', $screeningId)
+            ->exists();
+
+        return !$anyReserved;
+    }
 }
