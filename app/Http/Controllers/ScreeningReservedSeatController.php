@@ -3,17 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ReservedSeatResource;
-use App\Models\ReservedSeat;
+use App\Services\ReservedSeatService;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ScreeningReservedSeatController extends Controller
 {
+    public function __construct(
+        protected ReservedSeatService $reservedSeatService,
+    )
+    {}
+
     public function index(string $id): AnonymousResourceCollection
     {
-        $bookedSeats = ReservedSeat::query()
-            ->where(['screeening_id' => $id])
-            ->get();
+        $reservedSeats = $this->reservedSeatService->getReservedSeatsByScreening($id);
 
-        return ReservedSeatResource::collection($bookedSeats);
+        return ReservedSeatResource::collection($reservedSeats);
     }
 }
