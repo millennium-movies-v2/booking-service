@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBookingRequest;
-use App\Models\Booking;
-use App\Models\Status;
+use App\Http\Resources\BookingResource;
 use App\Services\BookingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class BookingController extends Controller
 {
@@ -14,6 +14,15 @@ class BookingController extends Controller
         protected BookingService $bookingService,
         )
     {}
+
+    public function index(): AnonymousResourceCollection
+    {
+        $userId = (string) request()->header('X-User-Id');
+
+        $bookings = $this->bookingService->getBookingsForUser($userId);
+
+        return BookingResource::collection($bookings);
+    }
 
     public function store(StoreBookingRequest $request): JsonResponse
     {
@@ -26,6 +35,4 @@ class BookingController extends Controller
 
         return response()->json($response, 201);
     }
-
-
 }

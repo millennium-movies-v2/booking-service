@@ -12,6 +12,7 @@ use App\Models\BookedSeat;
 use App\Models\Booking;
 use App\Repositories\Contracts\IBookedSeatRepository;
 use App\Repositories\Contracts\IBookingRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 class BookingService
 {
@@ -51,5 +52,10 @@ class BookingService
         SeatReservationRequested::dispatch($booking->id, $data['screening_id'], $seatIds );
 
         return $booking;
+    }
+
+    public function getBookingsForUser(string $userId): Collection
+    {
+        return $this->bookingRepository->getByUserId($userId);
     }
 }
