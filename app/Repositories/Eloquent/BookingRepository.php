@@ -6,6 +6,7 @@ use App\DTOs\BookingDataDTO;
 use App\Models\Booking;
 use App\Models\Status;
 use App\Repositories\Contracts\IBookingRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 class BookingRepository implements IBookingRepository
 {
@@ -22,5 +23,13 @@ class BookingRepository implements IBookingRepository
             'price'     => $data->price,
             'status_id' => $status->id,
         ]);
+    }
+
+    public function getByUserId(string $userId): Collection
+    {
+        return Booking::query()
+            ->with('status')
+            ->where('user_id', $userId)
+            ->get();
     }
 }
