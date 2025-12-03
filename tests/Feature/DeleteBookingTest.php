@@ -20,7 +20,7 @@ class DeleteBookingTest extends TestCase
         ]);
 
         $response = $this->withHeader('X-User-Id', $userId)
-                         ->delete(route('bookings.delete', ['booking' => $booking->id]));
+                         ->delete(route('bookings.destroy', ['booking' => $booking->id]));
 
         $response->assertOk();
 

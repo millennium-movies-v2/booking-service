@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
+use App\Models\Booking;
 use App\Services\BookingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -34,5 +35,17 @@ class BookingController extends Controller
         ];
 
         return response()->json($response, 201);
+    }
+
+    public function destroy(string $id)
+    {
+        $userId = (string) request()->header('X-User-Id');
+
+        $booking = Booking::query()
+                        ->findOrFail($id);
+
+        if ($booking->user_id != $userId) return false;
+
+        return $booking->delete();
     }
 }
