@@ -15,4 +15,10 @@ class ScreeningRepository implements IScreeningRepository
             ->orderBy('start_time')
             ->get();
     }
+
+    public function findById(string $id): Screening
+    {
+    return Screening::query()
+                ->findOrFail($id);
+    }
 }

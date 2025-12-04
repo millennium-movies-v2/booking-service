@@ -9,7 +9,6 @@ class SeatDTO
     public function __construct(
         public array $seatIds,
         public SeatTypeEnum $type,
-        public float $unitPrice
     ) {}
 }
 
