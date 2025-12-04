@@ -7,9 +7,9 @@ use App\DTOs\SeatDTO;
 
 class VIPSeatPricingStrategy implements ISeatPricingStrategy
 {
-    public function calculatePrice(SeatDTO $seat): float
+    public function calculatePrice(float $basePrice, int $count): float
     {
         $MULTIPLIER = 1.2;
-        return $seat->unitPrice * count($seat->seatIds) * $MULTIPLIER;
+        return $basePrice * $count * $MULTIPLIER;
     }
 }

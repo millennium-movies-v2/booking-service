@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\SeatReservationRequested;
+use App\Models\Screening;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Facades\Event;
@@ -11,49 +12,46 @@ use Tests\TestCase;
 class BookingCreationTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
+
+    private function createScreening(float $price = 15.0): Screening
+    {
+        return Screening::factory()->create(['price' => $price]);
+    }
+
     private function bookingData(): array
     {
         return [
-            'user_id'      => $this->faker->uuid(),
-            'screening_id' => $this->faker->uuid(),
             'seats' => [
-                [
-                    'seat_ids' => [
-                        $this->faker->uuid(),
-                        $this->faker->uuid(),
-                    ],
-                    'pricing' => [
-                        'type'       => 'Regular',
-                        'unit_price' => $this->faker->randomFloat(2, 10, 20),
-                    ],
-                ],
-                [
-                    'seat_ids' => [
-                        $this->faker->uuid(),
-                        $this->faker->uuid(),
-                        $this->faker->uuid(),
-                    ],
-                    'pricing' => [
-                        'type'       => 'VIP',
-                        'unit_price' => $this->faker->randomFloat(2, 10, 20),
-                    ],
-                ],
+                'Regular' => [$this->faker->uuid(), $this->faker->uuid()],
+                'VIP'     => [$this->faker->uuid(), $this->faker->uuid(), $this->faker->uuid()],
             ],
         ];
     }
 
-    public function test_that_post_bookings_returns_201_status_code(): void
+    private function postBooking(array $data, string $userId, string $screeningId)
     {
-        $response = $this->post('/bookings', $this->bookingData());
+        $payload = array_merge($data, ['screening_id' => $screeningId]);
+
+        return $this->withHeader('X-User-Id', $userId)
+                    ->postJson('/bookings', $payload);
+    }
+
+    public function test_post_bookings_returns_201_status_code(): void
+    {
+        $screening = $this->createScreening();
+        $userId = $this->faker->uuid();
+
+        $response = $this->postBooking($this->bookingData(), $userId, $screening->id);
 
         $response->assertStatus(201);
     }
 
-    public function test_that_post_bookings_returns_correct_json_structure(): void
+    public function test_post_bookings_returns_correct_json_structure(): void
     {
-        $bookingData = $this->bookingData();
+        $screening = $this->createScreening();
+        $userId = $this->faker->uuid();
 
-        $response = $this->post('/bookings', $bookingData);
+        $response = $this->postBooking($this->bookingData(), $userId, $screening->id);
 
         $response->assertJsonStructure([
             'booking_id',
@@ -61,41 +59,39 @@ class BookingCreationTest extends TestCase
         ]);
     }
 
-    public function test_that_booking_is_created_in_database(): void
+    public function test_booking_is_created_in_database(): void
     {
-        $bookingData = $this->bookingData();
+        $screening = $this->createScreening();
+        $userId = $this->faker->uuid();
 
-        $this->post('/bookings', $bookingData);
+        $this->postBooking($this->bookingData(), $userId, $screening->id);
 
-        $this->assertDatabaseHas('bookings', [
-            'user_id' => $bookingData['user_id'],
-        ]);
+        $this->assertDatabaseHas('bookings', ['user_id' => $userId]);
     }
 
-    public function test_that_booking_creates_booked_seat_entries(): void
+    public function test_booking_creates_booked_seat_entries(): void
     {
-        $bookingData = $this->bookingData();
-        
-        $totalSeats = collect($bookingData['seats'])
-        ->map(fn($seatGroup) => count($seatGroup['seat_ids']))
-        ->sum();
+        $screening = $this->createScreening();
+        $userId = $this->faker->uuid();
+        $data = $this->bookingData();
 
-        $this->post('/bookings', $bookingData);
+        $totalSeats = collect($data['seats'])->flatMap(fn($group) => $group)->count();
+
+        $this->postBooking($data, $userId, $screening->id);
 
         $this->assertDatabaseCount('booked_seats', $totalSeats);
     }
 
-    public function test_that_booking_dispatches_seat_reservation_event(): void
+    public function test_booking_dispatches_seat_reservation_event(): void
     {
-        Event::fake([
-            SeatReservationRequested::class,
-        ]);
+        Event::fake([SeatReservationRequested::class]);
 
-        $bookingData = $this->bookingData();
+        $screening = $this->createScreening();
+        $userId = $this->faker->uuid();
+        $data = $this->bookingData();
 
-        $this->post('/bookings', $bookingData);
+        $this->postBooking($data, $userId, $screening->id);
 
         Event::assertDispatched(SeatReservationRequested::class);
     }
-
 }

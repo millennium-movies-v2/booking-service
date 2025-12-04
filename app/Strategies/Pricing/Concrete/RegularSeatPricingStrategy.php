@@ -7,8 +7,9 @@ use App\DTOs\SeatDTO;
 
 class RegularSeatPricingStrategy implements ISeatPricingStrategy
 {
-    public function calculatePrice(SeatDTO $seat): float
+    public function calculatePrice(float $basePrice, int $count): float
     {
-        return $seat->unitPrice * count($seat->seatIds);
+        $MULTIPLIER = 1;
+        return $basePrice * $count * $MULTIPLIER;
     }
 }

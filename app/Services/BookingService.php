@@ -10,8 +10,10 @@ use App\Events\SeatReservationRequested;
 use App\Factories\Pricing\SeatPricingStrategyFactory;
 use App\Models\BookedSeat;
 use App\Models\Booking;
+use App\Models\Screening;
 use App\Repositories\Contracts\IBookedSeatRepository;
 use App\Repositories\Contracts\IBookingRepository;
+use App\Repositories\Contracts\IScreeningRepository;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -20,24 +22,30 @@ class BookingService
     public function __construct(
         protected IBookingRepository $bookingRepository,
         protected IBookedSeatRepository $bookedSeatRepository,
+        protected IScreeningRepository $screeningRepository,
+
     )
     {}
 
     public function createBooking(array $data): Booking
     {
-        $seatDTOs = array_map(fn($seat) => new SeatDTO(
-            seatIds: $seat['seat_ids'],
-            type: SeatTypeEnum::from($seat['pricing']['type']),
-            unitPrice: $seat['pricing']['unit_price']
-        ), $data['seats']);
+        $userId = request()->header('X-User-Id');
+        $screening = $this->screeningRepository->findById($data['screening_id']);
+        $basePrice = $screening->price;
 
-        $totalPrice = collect($seatDTOs)->sum(function ($seat) {
+        $seatDTOs = collect($data['seats'])
+            ->map(fn(array $seatIds, string $seatType) => new SeatDTO(
+                seatIds: $seatIds,
+                type: SeatTypeEnum::from($seatType),
+            ));
+
+        $totalPrice = $seatDTOs->sum(function (SeatDTO $seat) use ($basePrice) {
             $strategy = SeatPricingStrategyFactory::make($seat->type);
-            return $strategy->calculatePrice($seat);
+            return $strategy->calculatePrice($basePrice, count($seat->seatIds));
         });
 
         $bookingDTO = new BookingDataDTO(
-            userId: $data['user_id'],
+            userId: $userId,
             price: $totalPrice,
             status: StatusEnum::PENDING,
         );
