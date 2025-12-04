@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\DTOs\BookingDataDTO;
+use App\Enums\StatusEnum;
 use App\Models\Booking;
 use App\Models\Status;
 use App\Repositories\Contracts\IBookingRepository;
@@ -41,5 +42,29 @@ class BookingRepository implements IBookingRepository
     public function delete(Booking $booking): bool
     {
         return $booking->delete();
+    }
+
+    public function markAsConfirmed(Booking $booking): Booking
+    {
+        $status = Status::query()->firstOrCreate([
+            'name' => StatusEnum::CONFIRMED,
+        ]);
+
+        $booking->status()->associate($status);
+        $booking->save();
+
+        return $booking;
+    }
+
+    public function markAsFailed(Booking $booking): Booking
+    {
+        $status = Status::query()->firstOrCreate([
+            'name' => StatusEnum::FAILED,
+        ]);
+
+        $booking->status()->associate($status);
+        $booking->save();
+
+        return $booking;
     }
 }

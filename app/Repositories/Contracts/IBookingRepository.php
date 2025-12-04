@@ -15,4 +15,8 @@ interface IBookingRepository
     public function findById(string $id): Booking;
 
     public function delete(Booking $booking): bool;
+
+    public function markAsConfirmed(Booking $booking): Booking;
+
+    public function markAsFailed(Booking $booking): Booking;
 }

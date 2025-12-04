@@ -17,10 +17,10 @@ class SeatReservationFailed
     /**
      * Create a new event instance.
      */
-    public function __construct()
-    {
-        //
-    }
+    public function __construct(
+        public readonly string $bookingId,
+        )
+    {}
 
     /**
      * Get the channels the event should broadcast on.
