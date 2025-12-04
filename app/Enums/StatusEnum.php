@@ -6,4 +6,5 @@ enum StatusEnum: string
 {
     case PENDING   = 'Pending';
     case CONFIRMED = 'Confirmed';
+    case FAILED = 'Failed';
 }

@@ -17,7 +17,12 @@ class SeatReservationConfirmed
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct(
+        public readonly string $bookingId,
+        public readonly string $screeningId,
+        /** @var array<string> */
+        public readonly array $seatIds,
+    )
     {
         //
     }

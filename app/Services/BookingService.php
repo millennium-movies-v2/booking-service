@@ -48,8 +48,6 @@ class BookingService
         ->flatMap(fn($seat) => $seat->seatIds)
         ->all();
 
-        $this->bookedSeatRepository->createMany($booking->id, $seatIds);
-
         SeatReservationRequested::dispatch($booking->id, $data['screening_id'], $seatIds );
 
         return $booking;
@@ -72,5 +70,21 @@ class BookingService
         }
 
         return $this->bookingRepository->delete($booking);
+    }
+
+    public function confirmBooking(string $bookingId, array $seatIds): Booking
+    {
+        $booking = $this->bookingRepository->findById($bookingId);
+
+        $this->bookedSeatRepository->createMany($booking->id, $seatIds);
+
+        return $this->bookingRepository->markAsConfirmed($booking);
+    }
+
+    public function failBooking(string $bookingId): Booking
+    {
+        $booking = $this->bookingRepository->findById($bookingId);
+
+        return $this->bookingRepository->markAsFailed($booking);
     }
 }

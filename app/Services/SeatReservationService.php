@@ -18,9 +18,9 @@ class SeatReservationService
         $available = $this->reservedSeatRepository->areSeatsAvailable($screeningId, $seatIds);
 
         if ($available) {
-            SeatReservationConfirmed::dispatch();
+            SeatReservationConfirmed::dispatch($bookingId,$screeningId,$seatIds);
         } else {
-            SeatReservationFailed::dispatch();
+            SeatReservationFailed::dispatch($bookingId);
         }
     }
 }
